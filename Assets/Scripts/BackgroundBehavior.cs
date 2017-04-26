@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BackgroundBehavior : MonoBehaviour {
 
@@ -19,16 +20,54 @@ public enum BoundStatus
     };
     #endregion
 
+    #region level Managment
+    public enum level
+    {
+        Level1 = 1,
+        Level2 = 2,
+        Level3 = 3,
+    }
+    public struct levelVariables
+    {
+        public float enemySpawnInterval;
+        public int intialEnemies;
+        public int killsToAdvance;
+        public float enemySpeedMuilt; //enemeyspeed muiltiplier
+        public int enemyHP;
+        
+        public levelVariables(float Interval, int intital, int advance, float enspeed, int enHP)
+        {
+            enemySpawnInterval = Interval;
+            intialEnemies = intital;
+            killsToAdvance = advance;
+            enemySpeedMuilt = enspeed;
+            enemyHP = enHP;
+        }
+
+    }
+
+    private levelVariables level1 = new levelVariables(3.0f, 5,5,1f,3);
+    private levelVariables level2 = new levelVariables(2.0f, 20,30,1.5f,3);
+    private levelVariables level3 = new levelVariables(1.0f, 50,500,2.0f,5);
+    private level currentlevel = level.Level1;
+    #endregion
+
+
     #region enemy control variables
-    private float enemySpawnInterval = 3.0f;
     private bool enemyCanMove = false;
     private float nextEnemy = 3.0f;
-    //private bool spaceDetect = false;
+
+    public float enemySpawnInterval;
+    public int intialEnemies;
+    public int killsToAdvance;
+
     public GameObject enemySpawn = null;
-    private int intialEnemies = 50;
     public int currentEggs = 0;
     public int currentEnemies = 0;
     public int totalkilled = 0;
+
+    public float enemySpeedMuilt; //enemeyspeed muiltiplier
+    public int enemyHP;
     #endregion
     // Use this for initialization
     void OnGUI()
@@ -39,10 +78,35 @@ public enum BoundStatus
 
 
     void Start () {
-        setWorldBound();
+        //Scene check
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "Level1")
+            currentlevel = level.Level1;
+        else if (sceneName == "Level2")
+            currentlevel = level.Level2;
+        else if (sceneName == "Level3")
+            currentlevel = level.Level3;
+        else //ERROR defult level1
+            currentlevel = level.Level1;
+
+            setWorldBound();
         if (enemySpawn == null) {
             enemySpawn = Resources.Load("Prefabs/Enemy") as GameObject;
         }
+
+        switch (currentlevel)
+        {
+            case level.Level1:
+                loadLevelVar(level1);
+                break;
+            case level.Level2:
+                loadLevelVar(level2);
+                break;
+            case level.Level3:
+                loadLevelVar(level3);
+                break;
+        }
+
         for (int i = 0; i < intialEnemies; i++)
         {
             GameObject e = Instantiate(enemySpawn) as GameObject;
@@ -50,16 +114,46 @@ public enum BoundStatus
         }
 	}
 	
-	// Update is called once per frame
-	void Update () {
-        if (Input.GetKeyDown(KeyCode.Space))
+    private void loadLevelVar (levelVariables lvl)
+    {
+        enemySpawnInterval = lvl.enemySpawnInterval;
+        intialEnemies = lvl.intialEnemies;
+        killsToAdvance = lvl.killsToAdvance;
+        enemySpeedMuilt = lvl.enemySpeedMuilt; //enemeyspeed muiltiplier
+        enemyHP = lvl.enemyHP;
+
+}
+    // Update is called once per frame
+    void Update () {
+
+        //level change
+        if (totalkilled >= killsToAdvance)
         {
-            enemyCanMove = !enemyCanMove;
+            switch (currentlevel)
+            {
+                case level.Level1:
+                    currentlevel = level.Level2;
+                    SceneManager.LoadScene("Level2", LoadSceneMode.Single);
+                    break;
+                case level.Level2:
+                    currentlevel = level.Level3;
+                    SceneManager.LoadScene("Level3", LoadSceneMode.Single);
+                    break;
+                case level.Level3:
+                    //TODO you win
+                    break;
+            }
         }
-        if (canMove)
-        {
+
+
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    enemyCanMove = !enemyCanMove;
+        //}
+        //if (canMove)
+        //{
             spawnEnemy();
-        }
+        //}
 	}
 
     private void spawnEnemy() {

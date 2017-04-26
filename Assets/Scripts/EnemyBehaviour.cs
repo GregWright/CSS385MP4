@@ -27,7 +27,8 @@ public class EnemyBehaviour : MonoBehaviour {
     void Start () {
 		myBackground = GameObject.Find("Manager").GetComponent<BackgroundBehavior>();
         player = GameObject.Find("Player");
-        speed = Random.Range(20, 40);
+        hits = myBackground.enemyHP;
+        speed = Random.Range(20, 40)*myBackground.enemySpeedMuilt;
         float tempX = Random.Range(myBackground.worldBounds.min.x, myBackground.worldBounds.max.x);
         float tempY = Random.Range(myBackground.worldBounds.min.x, myBackground.worldBounds.max.x);
         transform.position = new Vector3(tempX, tempY, 0.0f);
@@ -62,7 +63,7 @@ public class EnemyBehaviour : MonoBehaviour {
         {
             runAway();
         }
-        if (myBackground.canMove && currentState != EnemyState.Stunned)
+        if (/*myBackground.canMove && */currentState != EnemyState.Stunned)
         {
             transform.position += speed * Time.smoothDeltaTime * transform.up;
             BackgroundBehavior.BoundStatus status =

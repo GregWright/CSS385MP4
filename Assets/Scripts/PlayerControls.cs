@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerControls : MonoBehaviour {
 
     #region Control Variables
-    private float maxSpeed = 20f;
-    private float maxRotate = 45f;
+    private float maxSpeed = 30f;
+    private float maxRotate = 67.5f;
     BackgroundBehavior myBackground = null;
     #endregion
 
