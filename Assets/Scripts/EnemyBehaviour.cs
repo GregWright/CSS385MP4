@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyBehaviour : MonoBehaviour {
+    
 
     #region Control variables
     public float speed;
@@ -151,6 +152,7 @@ public class EnemyBehaviour : MonoBehaviour {
         currentState = EnemyState.Stunned;
         GetComponent<SpriteRenderer>().color = Color.blue;
         stunTimer = Time.time;
+        
     }
 
     private void setRun()
