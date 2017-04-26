@@ -10,6 +10,7 @@ public class EnemyBehaviour : MonoBehaviour {
     public float rotationspeed = 9.0f;
     BackgroundBehavior myBackground = null;
     GameObject player = null;
+    AudioSource[] sounds; 
     private int hits = 3;
     EnemyState currentState = EnemyState.Normal;
     private float rundist = 30f;
@@ -27,6 +28,7 @@ public class EnemyBehaviour : MonoBehaviour {
     void Start () {
 		myBackground = GameObject.Find("Manager").GetComponent<BackgroundBehavior>();
         player = GameObject.Find("Player");
+        sounds = GetComponents<AudioSource>();
         hits = myBackground.enemyHP;
         speed = Random.Range(20, 40)*myBackground.enemySpeedMuilt;
         float tempX = Random.Range(myBackground.worldBounds.min.x, myBackground.worldBounds.max.x);
@@ -101,9 +103,14 @@ public class EnemyBehaviour : MonoBehaviour {
         {
             Destroy(other.gameObject);
             myBackground.currentEggs--;
-            if (hits <= 1)
+            if (hits == 1)
             {
-                Destroy(this.gameObject);
+                sounds[0].Play();
+                Renderer rend = GetComponent<SpriteRenderer>();
+                rend.enabled = false;
+                CircleCollider2D cir = GetComponent<CircleCollider2D>();
+                cir.enabled = false;
+                Destroy(this.gameObject,sounds[0].clip.length);
                 myBackground.currentEnemies--;
                 myBackground.totalkilled++;
             }
@@ -151,6 +158,7 @@ public class EnemyBehaviour : MonoBehaviour {
         currentState = EnemyState.Stunned;
         GetComponent<SpriteRenderer>().color = Color.blue;
         stunTimer = Time.time;
+        sounds[1].Play();
     }
 
     private void setRun()

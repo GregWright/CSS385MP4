@@ -49,7 +49,9 @@ public enum BoundStatus
     private levelVariables level1 = new levelVariables(3.0f, 5,5,1f,3);
     private levelVariables level2 = new levelVariables(2.0f, 20,30,1.5f,3);
     private levelVariables level3 = new levelVariables(1.0f, 50,500,2.0f,5);
-    private level currentlevel = level.Level1;
+    public level currentlevel = level.Level1;
+
+    bool Win = false;
     #endregion
 
 
@@ -70,9 +72,36 @@ public enum BoundStatus
     public int enemyHP;
     #endregion
     // Use this for initialization
+
+    private GUIStyle style = new GUIStyle();
     void OnGUI()
     {
-        GUI.Box(Rect.MinMaxRect(10, 10, 110, 110), "Baskets:\n  Current: "+currentEnemies+"\n  filled: "+totalkilled+"\nEggs Depolyed:\n"+currentEggs);
+        if (Win)
+        {
+            style.fontSize = 72;
+            style.alignment = TextAnchor.MiddleCenter;
+            GUI.Label(new Rect(Screen.width/2 - 200, Screen.height/2-50, 400, 100), "You Win!", style);
+            style.fontSize = 36;
+            if (GUI.Button(new Rect(Screen.width / 2 - 100, Screen.height / 2 + 50,200 , 50), "Continue?",style))
+            {
+                switch (currentlevel)
+                {
+                    case level.Level2:
+                        SceneManager.LoadScene("Level2", LoadSceneMode.Single);
+                        break;
+                    case level.Level3:
+                        SceneManager.LoadScene("Level3", LoadSceneMode.Single);
+                        break;
+                    case level.Level1:
+                        //??
+                        break;
+                }
+            }
+        }
+        else
+        {
+            GUI.Box(Rect.MinMaxRect(10, 10, 110, 110), "Baskets:\n  Current: " + currentEnemies + "\n  filled: " + totalkilled + "\nEggs Depolyed:\n" + currentEggs);
+        }
     }
 
 
@@ -133,11 +162,13 @@ public enum BoundStatus
             {
                 case level.Level1:
                     currentlevel = level.Level2;
-                    SceneManager.LoadScene("Level2", LoadSceneMode.Single);
+                    Win = true;
+                    killsToAdvance = level2.killsToAdvance;
                     break;
                 case level.Level2:
                     currentlevel = level.Level3;
-                    SceneManager.LoadScene("Level3", LoadSceneMode.Single);
+                    killsToAdvance = level3.killsToAdvance;
+                    Win = true;
                     break;
                 case level.Level3:
                     //TODO you win
@@ -145,15 +176,7 @@ public enum BoundStatus
             }
         }
 
-
-        //if (Input.GetKeyDown(KeyCode.Space))
-        //{
-        //    enemyCanMove = !enemyCanMove;
-        //}
-        //if (canMove)
-        //{
-            spawnEnemy();
-        //}
+        spawnEnemy();
 	}
 
     private void spawnEnemy() {
